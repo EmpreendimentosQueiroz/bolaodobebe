@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chá Revelação — Qual é o seu palpite?</title>
+<style>
+:root{
+  --bg:#fbf7f2; --card:#ffffff; --ink:#2b2a33; --muted:#6f6b7a; --line:#ece6dd;
+  --boy:#3b82c4; --boy-bg:#e6f1fb; --girl:#d9568a; --girl-bg:#fce8f1; --mix-bg:#efe9fb; --mix:#7a5cc4;
+  --ok:#2f855a;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#17161b; --card:#222129; --ink:#f1eff5; --muted:#a29fae; --line:#34323d;
+    --boy:#6db0ef; --boy-bg:#1d2b3a; --girl:#f08ab4; --girl-bg:#3a2230; --mix-bg:#2b2540; --mix:#b39df0; --ok:#68d391; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.7rem;margin:8px 0 4px;text-align:center}
+.sub{color:var(--muted);text-align:center;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+h2{font-size:1.05rem;margin:0 0 12px}
+h3{font-size:.85rem;margin:14px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+label{display:block;font-size:.9rem;color:var(--muted);margin:12px 0 6px}
+input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:1rem}
+.choices{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+.choices.three{grid-template-columns:1fr 1fr 1fr}
+.choice{padding:14px 8px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font-size:.95rem;cursor:pointer;font-weight:600;line-height:1.25}
+.choice.on{border-color:var(--ink)}
+.choice.boy.on{border-color:var(--boy);background:var(--boy-bg);color:var(--boy)}
+.choice.girl.on{border-color:var(--girl);background:var(--girl-bg);color:var(--girl)}
+.choice.mix.on{border-color:var(--mix);background:var(--mix-bg);color:var(--mix)}
+.choice.neutral.on{background:var(--ink);color:var(--bg)}
+button.primary{width:100%;margin-top:16px;padding:14px;border:0;border-radius:12px;background:var(--ink);color:var(--bg);font-size:1.05rem;font-weight:700;cursor:pointer}
+button.primary:disabled{opacity:.45;cursor:not-allowed}
+button.ghost{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;font-size:.9rem}
+button.danger{color:#c53030;border-color:#c53030}
+.msg{margin-top:10px;font-size:.95rem;min-height:1.2em}
+.msg.err{color:#c53030} .msg.ok{color:var(--ok);font-weight:600}
+.score{display:grid;gap:8px}
+.srow{display:flex;align-items:center;gap:10px;font-size:.95rem}
+.srow .lbl{flex:0 0 150px}
+.srow .track{flex:1;height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.srow .fill{height:100%;border-radius:6px}
+.srow .num{flex:0 0 26px;text-align:right;font-weight:700}
+.srow.win .lbl{font-weight:700;color:var(--ok)}
+.fill.boy{background:var(--boy)} .fill.girl{background:var(--girl)} .fill.mix{background:var(--mix)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);font-size:.95rem}
+th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.03em}
+td.r,th.r{text-align:right}
+.won{color:var(--ok);font-weight:700} .lost{color:var(--muted)}
+.banner{background:var(--girl-bg);border-radius:12px;padding:12px;margin-bottom:16px;font-size:.9rem}
+.result{text-align:center;font-size:1.25rem;font-weight:700;padding:16px;border-radius:14px;margin-bottom:16px;background:var(--mix-bg)}
+.result small{display:block;font-weight:500;font-size:.95rem;margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{color:var(--muted);text-align:center;padding:12px}
+.note{color:var(--muted);font-size:.85rem;margin-top:10px}
+.foot{text-align:center;margin-top:24px}
+.foot button{background:none;border:0;color:var(--muted);font-size:.85rem;text-decoration:underline;cursor:pointer}
+@media (max-width:420px){ .srow .lbl{flex-basis:120px} .choices.three{grid-template-columns:1fr} }
+details.org{margin-top:20px;text-align:center}
+details.org summary{color:var(--muted);font-size:.85rem;cursor:pointer}
+details.org .box{margin-top:12px;text-align:left}
+h3{font-size:.85rem;margin:14px 0 8px;color:var(--muted)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>👶 Chá Revelação</h1>
+  <p class="sub">Qual é o seu palpite? Escreva seu nome e escolha!</p>
+
+  <div id="banner" class="banner" hidden></div>
+  <div id="result" class="result" hidden></div>
+
+  <section class="card" id="formCard">
+    <h2>Faça seu palpite</h2>
+    <label for="nome">Seu nome</label>
+    <input type="text" id="nome" maxlength="40" placeholder="Ex.: Tia Selma" autocomplete="off">
+
+    <label>Quantos bebês?</label>
+    <div class="choices">
+      <button type="button" class="choice neutral" id="tUm">👶 Um bebê</button>
+      <button type="button" class="choice neutral" id="tGem">👶👶 Gêmeos</button>
+    </div>
+
+    <div id="palpiteBox" hidden>
+      <label>Seu palpite</label>
+      <div class="choices" id="choicesUm" hidden>
+        <button type="button" class="choice boy" data-k="um-menino">💙 Menino</button>
+        <button type="button" class="choice girl" data-k="um-menina">💗 Menina</button>
+      </div>
+      <div class="choices three" id="choicesGem" hidden>
+        <button type="button" class="choice boy" data-k="gemeos-menino">💙💙 Dois meninos</button>
+        <button type="button" class="choice girl" data-k="gemeos-menina">💗💗 Duas meninas</button>
+        <button type="button" class="choice mix" data-k="gemeos-casal">💙💗 Casal</button>
+      </div>
+    </div>
+
+    <button class="primary" id="apostar" type="button">Enviar palpite</button>
+    <div class="msg" id="formMsg"></div>
+  </section>
+
+  <section class="card">
+    <h2>Placar dos palpites</h2>
+    <div class="score" id="score"></div>
+  </section>
+
+  <section class="card">
+    <h2>Quem já palpitou</h2>
+    <div id="list"></div>
+  </section>
+
+
+
+  <details class="org" id="org">
+    <summary>Opções do organizador</summary>
+    <div class="box card">
+      <h3>Revelar o resultado</h3>
+      <div class="row">
+        <button class="ghost" data-r="um-menino" type="button">💙 Foi menino</button>
+        <button class="ghost" data-r="um-menina" type="button">💗 Foi menina</button>
+        <button class="ghost" data-r="gemeos-menino" type="button">💙💙 Dois meninos</button>
+        <button class="ghost" data-r="gemeos-menina" type="button">💗💗 Duas meninas</button>
+        <button class="ghost" data-r="gemeos-casal" type="button">💙💗 Casal</button>
+        <button class="ghost" id="reopen" type="button">Reabrir palpites</button>
+      </div>
+      <p class="note">Com esta área aberta, aparece um ✕ ao lado de cada palpite para remover.</p>
+      <div class="msg" id="adminMsg"></div>
+    </div>
+  </details>
+</main>
+
+<script src="config.js"></script>
+<script>
+var BLOB_ID = (window.CONFIG && window.CONFIG.BLOB_ID && window.CONFIG.BLOB_ID !== 'COLE_AQUI') ? window.CONFIG.BLOB_ID : '';
+var API = 'https://jsonblob.com/api/jsonBlob/' + BLOB_ID;
+
+var OPTIONS = [
+  {k:'um-menino',     label:'💙 Menino',          cls:'boy'},
+  {k:'um-menina',     label:'💗 Menina',          cls:'girl'},
+  {k:'gemeos-menino', label:'💙💙 Dois meninos',  cls:'boy'},
+  {k:'gemeos-menina', label:'💗💗 Duas meninas',  cls:'girl'},
+  {k:'gemeos-casal',  label:'💙💗 Casal (gêmeos)', cls:'mix'}
+];
+var LABEL = {}; OPTIONS.forEach(function(o){LABEL[o.k]=o.label});
+var $ = function(id){return document.getElementById(id)};
+
+var data = {palpites:[], resultado:null};
+var tipo=null, palpite=null, orgOpen=false, busy=false;
+
+function setMsg(el,text,cls){el.textContent=text||''; el.className='msg'+(cls?' '+cls:'')}
+function banner(t){var b=$('banner'); if(t){b.hidden=false;b.textContent=t}else b.hidden=true}
+
+function normalize(d){
+  d = d && typeof d==='object' ? d : {};
+  var arr = Array.isArray(d.palpites) ? d.palpites : [];
+  return {
+    palpites: arr.filter(function(p){return p && typeof p.nome==='string' && LABEL[p.palpite]}),
+    resultado: LABEL[d.resultado] ? d.resultado : null
+  };
+}
+
+async function load(){
+  var r = await fetch(API,{headers:{'Accept':'application/json'},cache:'no-store'});
+  if(!r.ok) throw new Error('GET '+r.status);
+  return normalize(await r.json());
+}
+async function save(d){
+  var r = await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(d)});
+  if(!r.ok) throw new Error('PUT '+r.status);
+}
+// lê o mais recente, aplica a mudança e grava (evita sobrescrever palpites de outras pessoas)
+async function update(fn){
+  var fresh = await load();
+  var next = fn(fresh);
+  await save(next);
+  data = next;
+}
+
+function render(){
+  var res=data.resultado, bets=data.palpites;
+  $('formCard').hidden=!!res;
+  $('tUm').classList.toggle('on',tipo==='um');
+  $('tGem').classList.toggle('on',tipo==='gemeos');
+  $('palpiteBox').hidden=!tipo;
+  $('choicesUm').hidden=tipo!=='um';
+  $('choicesGem').hidden=tipo!=='gemeos';
+  document.querySelectorAll('[data-k]').forEach(function(b){b.classList.toggle('on',b.dataset.k===palpite)});
+  $('apostar').disabled=busy;
+
+  var total=bets.length, sc=$('score'); sc.textContent='';
+  OPTIONS.forEach(function(o){
+    var n=bets.filter(function(b){return b.palpite===o.k}).length;
+    var row=document.createElement('div'); row.className='srow'+(res===o.k?' win':'');
+    var l=document.createElement('span'); l.className='lbl'; l.textContent=o.label;
+    var tr=document.createElement('span'); tr.className='track';
+    var f=document.createElement('span'); f.className='fill '+o.cls; f.style.display='block'; f.style.width=(total?n/total*100:0)+'%';
+    tr.appendChild(f);
+    var nm=document.createElement('span'); nm.className='num'; nm.textContent=n;
+    row.appendChild(l); row.appendChild(tr); row.appendChild(nm); sc.appendChild(row);
+  });
+
+  var rEl=$('result');
+  if(res){
+    var winners=bets.filter(function(b){return b.palpite===res});
+    rEl.hidden=false; rEl.textContent='🎉 Resultado: '+LABEL[res];
+    var sm=document.createElement('small');
+    sm.textContent = winners.length
+      ? (winners.length===1?'Acertou: ':'Acertaram: ')+winners.map(function(w){return w.nome}).join(', ')
+      : 'Ninguém acertou desta vez!';
+    rEl.appendChild(sm);
+  } else rEl.hidden=true;
+
+  var list=$('list'); list.textContent='';
+  if(!bets.length){
+    var e=document.createElement('div'); e.className='empty'; e.textContent='Ninguém palpitou ainda. Seja o primeiro!'; list.appendChild(e);
+  } else {
+    var t=document.createElement('table');
+    var head=document.createElement('tr');
+    var cols=['Nome','Palpite']; if(res) cols.push(''); if(orgOpen) cols.push('');
+    cols.forEach(function(c,i){var th=document.createElement('th'); th.textContent=c; if(i>=2)th.className='r'; head.appendChild(th)});
+    t.appendChild(head);
+    bets.forEach(function(b){
+      var tr=document.createElement('tr');
+      var a=document.createElement('td'); a.textContent=b.nome; tr.appendChild(a);
+      var p=document.createElement('td'); p.textContent=LABEL[b.palpite]; tr.appendChild(p);
+      if(res){
+        var r=document.createElement('td'); r.className='r '+(b.palpite===res?'won':'lost');
+        r.textContent=b.palpite===res?'✅ Acertou':'—'; tr.appendChild(r);
+      }
+      if(orgOpen){
+        var td=document.createElement('td'); td.className='r';
+        var x=document.createElement('button'); x.className='ghost danger'; x.textContent='✕'; x.setAttribute('aria-label','Remover '+b.nome);
+        x.addEventListener('click',async function(){
+          try{ await update(function(d){d.palpites=d.palpites.filter(function(q){return q.id!==b.id}); return d}); render(); }
+          catch(e){ setMsg($('adminMsg'),'Não foi possível remover.','err'); }
+        });
+        td.appendChild(x); tr.appendChild(td);
+      }
+      t.appendChild(tr);
+    });
+    list.appendChild(t);
+  }
+}
+
+$('tUm').addEventListener('click',function(){ if(tipo!=='um'){tipo='um'; palpite=null;} render(); });
+$('tGem').addEventListener('click',function(){ if(tipo!=='gemeos'){tipo='gemeos'; palpite=null;} render(); });
+document.querySelectorAll('[data-k]').forEach(function(b){b.addEventListener('click',function(){palpite=b.dataset.k; render();})});
+$('org').addEventListener('toggle',function(){orgOpen=$('org').open; render();});
+
+$('apostar').addEventListener('click',async function(){
+  var msg=$('formMsg');
+  var nome=$('nome').value.trim().replace(/\s+/g,' ');
+  if(!BLOB_ID){setMsg(msg,'A página ainda não foi configurada.','err');return}
+  if(data.resultado){setMsg(msg,'Os palpites já foram encerrados.','err');return}
+  if(!nome){setMsg(msg,'Digite seu nome.','err');return}
+  if(!tipo){setMsg(msg,'Escolha: um bebê ou gêmeos.','err');return}
+  if(!palpite){setMsg(msg,'Escolha o seu palpite.','err');return}
+  busy=true; render(); setMsg(msg,'Enviando…');
+  try{
+    var dup=false;
+    await update(function(d){
+      if(d.palpites.some(function(b){return b.nome.toLowerCase()===nome.toLowerCase()})){dup=true; return d}
+      d.palpites.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),nome:nome,palpite:palpite,ts:Date.now()});
+      return d;
+    });
+    if(dup){ setMsg(msg,'Já existe um palpite com esse nome. Use o sobrenome ou um apelido.','err'); }
+    else { $('nome').value=''; tipo=null; palpite=null; setMsg(msg,'Palpite enviado! Boa sorte 🍀','ok'); }
+  }catch(e){
+    setMsg(msg,'Não foi possível enviar. Tente de novo.','err');
+  }
+  busy=false; render();
+});
+
+document.querySelectorAll('[data-r]').forEach(function(b){b.addEventListener('click',async function(){
+  try{ await update(function(d){d.resultado=b.dataset.r; return d}); setMsg($('adminMsg'),'Resultado registrado!','ok'); render(); }
+  catch(e){ setMsg($('adminMsg'),'Não foi possível salvar.','err'); }
+})});
+$('reopen').addEventListener('click',async function(){
+  try{ await update(function(d){d.resultado=null; return d}); setMsg($('adminMsg'),'Palpites reabertos.','ok'); render(); }
+  catch(e){ setMsg($('adminMsg'),'Não foi possível salvar.','err'); }
+});
+
+render();
+
+async function refresh(){
+  if(busy) return;
+  try{ data = await load(); banner(''); render(); }
+  catch(e){ banner('Não foi possível carregar o placar agora. Confira sua internet.'); }
+}
+if(!BLOB_ID){
+  banner('Falta configurar a página: preencha o arquivo config.js (veja o LEIAME).');
+} else {
+  refresh();
+  setInterval(refresh,5000);
+}
+</script>
+</body>
+</html>
